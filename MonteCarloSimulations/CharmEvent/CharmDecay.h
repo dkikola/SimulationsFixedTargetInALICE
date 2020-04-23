@@ -39,6 +39,7 @@ public:
 	Part getDaughter(unsigned int);
 	void addDaughter(Part p);
 	void setDecayVrt(double x, double y, double z);
+	void clear();
 
 	const TVector3& getDecayVrt() const {
 		return decayVrt;

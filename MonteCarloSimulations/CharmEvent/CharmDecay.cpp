@@ -51,6 +51,19 @@ void CharmDecay::setDecayVrt(double x, double y, double z){
 	decayVrt.SetXYZ(x,y,z);
 }
 
+void CharmDecay::clear(){
+	listOdDaughters.clear();
+	id = 0;
+	idParent = 0;
+	pT = 0;
+	eta = 0;
+	phi = 0;
+	yLab = 0;
+	decayVrt.SetXYZ(0,0,0);
+	nDaughters = 0;
+
+}
+
 Part::Part(short id, float pT, float eta, float phi, float yLab){
 	this->id = id;
 	this->pT = pT;

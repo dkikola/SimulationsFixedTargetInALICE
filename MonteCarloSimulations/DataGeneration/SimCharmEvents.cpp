@@ -153,6 +153,8 @@ void SimCharmEvents::run(int N) {
 		     *  c) save data to an D-meson event
 		     */
 
+		    charmedMesonDecay.clear();
+
 			if(isDmeson(p.id())) {
 
 				dNdpT_Dmeson->Fill(p.pT());
@@ -161,7 +163,6 @@ void SimCharmEvents::run(int N) {
 				/* apply rapidity cuts for D mesons */
 				if(p.y()<minCharmY)continue;
 				if(p.y()>maxCharmY)continue;
-
 
 				if(isDmesonDecay(p,charmedMesonDecay)==true){
 					mDmesonEvent->AddCharmMesonInfo(charmedMesonDecay);
@@ -199,7 +200,7 @@ bool SimCharmEvents::passHadronCut(Particle& p) {
 	if(p.isFinal() && p.pT()> minPtHadron
 			&& p.eta() > minHadronEta
 			&& p.eta() < maxHadronEta
-			&& p.charge() > 0)
+			&& p.isCharged())
 		return true;
 	else
 		return false;
