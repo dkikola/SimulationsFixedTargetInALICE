@@ -8,7 +8,7 @@
 #include "CharmDecay.h"
 #include <iostream>
 
-CharmDecay::CharmDecay(): id(0), pT(0), eta(0), phi(0), yLab(0), nDaughters(0)
+CharmDecay::CharmDecay(): id(0), idParent(0), origin(0), isFD(-1), pT(0), eta(0), phi(0), yLab(0), nDaughters(0)
 {
 }
 
@@ -18,6 +18,8 @@ CharmDecay::CharmDecay(const CharmDecay &d){
 
 	id = d.id;
 	idParent = d.idParent;
+    origin = d.origin;
+    isFD = d.isFD;
 	pT = d.pT;
 	eta = d.eta;
 	phi = d.phi;
@@ -55,6 +57,8 @@ void CharmDecay::clear(){
 	listOdDaughters.clear();
 	id = 0;
 	idParent = 0;
+    origin = 0;
+    isFD = -1;
 	pT = 0;
 	eta = 0;
 	phi = 0;

@@ -1,0 +1,108 @@
+! File: SignalDmeson.cmnd
+! D meson production at STAR 
+
+!Beam type and energy
+Beams:idA = 2212
+Beams:idB = 2212
+Beams:eCM = 200 ! RHIC nominal energy
+
+Random:setSeed = on
+Random:seed = 0
+
+! Tell that also long-lived should decay. All particles with tau0 below 1000 mm are by default initialized to allow decays.
+
+# 211:mayDecay = true			!pi+-
+# 321:mayDecay = true 			!K+-
+
+! set decays
+#443:mayDecay = true
+#443:onMode = on
+#443:onIfMatch = 13 -13
+
+! Settings for hard-process generation internal to Pythia8.
+
+# Uncomment next 2 lines for charm
+# HardQCD:gg2ccbar = on    ! g g -> c cbar
+# HardQCD:qqbar2ccbar = on ! q qbar -> c cbar
+
+# Uncomment next 2 lines for bottom
+# HardQCD:gg2bbbar = on    ! g g -> b bbar
+# HardQCD:qqbar2bbbar = on ! q qbar -> b bbar
+
+# Hard processes main switch (note that chamonium is not on in this mode)
+HardQCD:all = on    
+                 
+#------------------------------------------------------------------------------
+# To limit particle production to a certain pthat range uncomment
+# these lines. Use only when you 100% know what you are doing.
+# It is extremely useful to split runs up in ptHat bins to generate
+# statistics evenly in pt. Book keeping is important then (cross-sections,
+# number of events) to compile the final complete spectra.
+# Documentation: <pyhiadir>/htmldoc/PhaseSpaceCuts.html
+#------------------------------------------------------------------------------
+# PhaseSpace:pTHatMin = 20 ! minimum pT in hard process
+# PhaseSpace:pTHatMax = 50
+
+
+#------------------------------------------------------------------------------
+# Scales (Ramona's suggestions)
+# This sets the scale to settings typically for hard probes:
+# mu_F = mu_R = 2*mT
+# Documentation: <pyhiadir>/htmldoc/CouplingsAndScales.html
+#------------------------------------------------------------------------------
+SigmaProcess:renormScale2 = 3
+SigmaProcess:factorScale2 = 3
+SigmaProcess:renormMultFac = 2   ! 2mT
+SigmaProcess:factorMultFac = 2   ! 2mT
+
+#------------------------------------------------------------------------------
+# PDF Selection:
+# Note: you need LHAPDF to be installed. Pythia 8 only provides a 
+# minimal set to get started.
+# The choice of PDF here is greatly motivated by:
+# A.~Sherstnev and R.~S.~Thorne, arXiv:0807.2132 and arXiv:0711.2473v3
+# and W. Vogelsang (private communication)
+# These are PDFs especially made for LO Monte-Carlo generators such
+# as PYTHIA.
+# The state-of-the-art NLO PDF is cteq66.LHgrid which can be used
+# as an alternative (also from LHAPDF) but with the known problems
+# that arise when using a NLO PDF in an LO simulator.
+# Documentation: <pyhiadir>/htmldoc/PDFSelection.html
+#------------------------------------------------------------------------------
+PDF:pSet = LHAPDF6:CT10nlo
+#PDF:extrapolate = on
+
+#------------------------------------------------------------------------------
+# Relative production ratio vector/pseudoscalar for charm and bottom mesons
+# This was originally PARJ(13) where PARJ(13) = V/(PS+V) that is the 
+# vector meson  fraction of primary charm+bottom mesons. 
+# Andre David (CERN/NA60) made an exhaustive study and found that the
+# world data supports 0.6 while PYTHIA default was PARJ(13) = 3/4 = 0.75
+# from simple spin counting.
+# In PYTHIA8 we now use V/PS not V/(PS+V)
+# Documentation: <pyhiadir>/htmldoc/FlavourSelection.html
+#------------------------------------------------------------------------------
+StringFlav:mesonCvector = 1.5    ! same as PARJ(13)=0.6
+StringFlav:mesonBvector = 3      ! leave at 0.75 
+
+#------------------------------------------------------------------------------
+# Heavy quark masses.
+# Note that this should match with the ones used in the PDF.
+# The masses are listed in the header of the refering PDF file.
+# Documentation: <pyhiadir>/htmldoc/ParticleDataScheme.html
+# Documentation: <pyhiadir>/htmldoc/ParticleData.html
+#------------------------------------------------------------------------------
+4:m0 = 1.43
+5:m0 = 4.30
+
+
+! 4) Switch off some key components of the simulation, for comparisons.
+#PartonLevel:ISR = on             	! initial-state radiation 
+#BeamRemnants:primordialKT = on   	! primordial kt
+#PartonLevel:FSR = on             	! final-state radiation
+#PartonLevel:all = off              ! stop after hard process 
+#HadronLevel:Hadronize = off        ! no hadronization
+#HadronLevel:Decay = off            ! no decays
+
+
+

@@ -37,6 +37,7 @@ SimCharmEvents::SimCharmEvents() {
 	maxHadronEta = 1.0;
 
 	energy = 8000.0;	// Beam energy, in GeV
+    useExternalPDF = false;
 }
 
 SimCharmEvents::~SimCharmEvents() {
@@ -56,37 +57,69 @@ void SimCharmEvents::init() {
 	/* Initialize list of HF mesons */
 	initHfHadronIds();
 
-	// set fixed-target collision mode
-	/*
-	 * From http://home.thep.lu.se/~torbjorn/pythia82html/BeamParameters.html:
-	 * option 2 : the beams are back-to-back, but with different energies,
-	 * see Beams:eA and Beams:eB below.
-	 * This option could also be used for fixed-target configurations.
-	 */
+    if(useExternalConfFile) {
+        pythia.readFile(pythiaConfigFile.Data());
+    }
+    else {
+        // set fixed-target collision mode
+        /*
+         * From http://home.thep.lu.se/~torbjorn/pythia82html/BeamParameters.html:
+         * option 2 : the beams are back-to-back, but with different energies,
+         * see Beams:eA and Beams:eB below.
+         * This option could also be used for fixed-target configurations.
+         */
 
-	pythia.readString("Beams:frameType = 2");
+        pythia.readString("Beams:frameType = 2");
 
-	TString strBeamCollEenergy;
-	strBeamCollEenergy.Form("Beams:eA = %f",energy);
-	pythia.readString(strBeamCollEenergy.Data());
+        TString strBeamCollEenergy;
+        strBeamCollEenergy.Form("Beams:eA = %f",energy);
+        pythia.readString(strBeamCollEenergy.Data());
 
-	pythia.readString("Beams:eB = 0.");
+        pythia.readString("Beams:eB = 0.");
 
-	pythia.readString("Random:setSeed = on");
-	pythia.readString("Random:seed = 0");
+        pythia.readString("Random:setSeed = on");
+        pythia.readString("Random:seed = 0");
 
-	pythia.readString("HardQCD:all = on");
-	pythia.readString("Charmonium:all = on");
+        pythia.readString("HardQCD:all = on");
+        pythia.readString("Charmonium:all = on");
 
-	/* following settings based on https://www.star.bnl.gov/protected/heavy/ullrich/pythia8/star_hf_tune_v1.1.cmnd" */
-	/* Scales (Ramona's suggestions),
-		This sets the scale to settings typically for hard probes:
-		mu_F = mu_R = 2*mT
-	 */
-	pythia.readString("SigmaProcess:renormScale2 = 3");
-	pythia.readString("SigmaProcess:factorScale2 = 3");
-	pythia.readString("SigmaProcess:renormMultFac = 2");   // ! 2mT
-	pythia.readString("SigmaProcess:factorMultFac = 2");   // ! 2mT
+        // external PDF, requires LHAPDF package and the corresponding PDF set installed
+        if(useExternalPDF) {
+            pythia.readString("PDF:pSet = LHAPDF6:MRSTMCal"); // LHAPDF6:CT10nlo
+            pythia.readString("PDF:extrapolate = on");
+        }
+        /* Heavy quark masses.
+        # Note that this should match with the ones used in the PDF.
+        # The masses are listed in the header of the refering PDF file.
+        # Documentation: <pyhiadir>/htmldoc/ParticleDataScheme.html
+        # Documentation: <pyhiadir>/htmldoc/ParticleData.html
+        */
+        pythia.readString("4:m0 = 1.43");  // ! charm quark mass
+        pythia.readString("5:m0 = 4.30");  // ! beauty quark mass
+
+        /* following settings based on https://www.star.bnl.gov/protected/heavy/ullrich/pythia8/star_hf_tune_v1.1.cmnd" */
+        /* Scales (Ramona's suggestions),
+            This sets the scale to settings typically for hard probes:
+            mu_F = mu_R = 2*mT
+         */
+        pythia.readString("SigmaProcess:renormScale2 = 3");
+        pythia.readString("SigmaProcess:factorScale2 = 3");
+        pythia.readString("SigmaProcess:renormMultFac = 2");   // ! 2mT
+        pythia.readString("SigmaProcess:factorMultFac = 2");   // ! 2mT
+
+        /* Relative production ratio vector/pseudoscalar for charm and bottom mesons
+        # This was originally PARJ(13) where PARJ(13) = V/(PS+V) that is the
+        # vector meson  fraction of primary charm+bottom mesons.
+        # Andre David (CERN/NA60) made an exhaustive study and found that the
+        # world data supports 0.6 while PYTHIA default was PARJ(13) = 3/4 = 0.75
+        # from simple spin counting.
+        # In PYTHIA8 we now use V/PS not V/(PS+V)
+        # Documentation: <pyhiadir>/htmldoc/FlavourSelection.html
+        */
+        pythia.readString("StringFlav:mesonCvector = 1.5"); // ! same as PARJ(13)=0.6
+        pythia.readString("StringFlav:mesonBvector = 3");   // ! leave at 0.75
+
+    }
 
 	pythia.init();
 
@@ -105,8 +138,13 @@ void SimCharmEvents::saveData() {
 
 	TString simInfo;
 
-	simInfo.Form("p beam E =  %1.1f GeV, pT_hadron > %1.2f GeV/c, %1.2f < eta_hadron < %1.2f, %1.2f < y_D0 < %1.2f",energy,minPtHadron,minHadronEta,
+    if(useExternalConfFile){
+        simInfo.Form("confFile: %s, pT_hadron > %1.2f GeV/c, %1.2f < eta_hadron < %1.2f, %1.2f < y_D0 < %1.2f",pythiaConfigFile.Data() ,minPtHadron,minHadronEta,
+                maxHadronEta, minCharmY,maxCharmY);
+    }else {
+        simInfo.Form("p beam E =  %1.1f GeV, pT_hadron > %1.2f GeV/c, %1.2f < eta_hadron < %1.2f, %1.2f < y_D0 < %1.2f",energy,minPtHadron,minHadronEta,
 			maxHadronEta, minCharmY,maxCharmY);
+    }
 
 	TObjString info(simInfo);
 
@@ -245,6 +283,8 @@ bool SimCharmEvents::isDmesonDecay(Particle& p, CharmDecay& c){
 			c.setPhi(p.phi());
 			c.setPt(p.pT());
 			c.setYLab(p.y());
+            c.setOrigin(getOrigin(p));
+            c.setIsFD(isFeedDown(p));
 
 			/* here I ordered daughters, K is first, but we could skip it*/
 			if(dauthter1Id == 321){
@@ -296,6 +336,8 @@ bool SimCharmEvents::isDmesonDecay(Particle& p, CharmDecay& c){
 			c.setPhi(p.phi());
 			c.setPt(p.pT());
 			c.setYLab(p.y());
+            c.setOrigin(getOrigin(p));
+            c.setIsFD(isFeedDown(p));
 
 			for(int i=0;i<3;++i){
 					d = pythia.event[p.daughterList()[i]];
@@ -337,6 +379,8 @@ bool SimCharmEvents::isHfMuon(Particle &mu, CharmDecay &c) {
 		c.setPhi(parent.phi());
 		c.setPt(parent.pT());
 		c.setYLab(parent.y());
+        c.setOrigin(getOrigin(mu));
+        c.setIsFD(isFeedDown(mu));
 
 		Part muonHF(mu.id(), mu.pT(), mu.eta(), mu.phi(), mu.y());
 		c.addDaughter(muonHF);
@@ -376,3 +420,31 @@ void SimCharmEvents::initHfHadronIds(){
 
 }
 
+
+short SimCharmEvents::getOrigin(Particle& p){
+
+    int motherId = p.mother1();
+    while(motherId > 0){
+        Particle mother = pythia.event[motherId];
+        if(mother.idAbs() < 7 || mother.idAbs() == 21){ //finish once a quark or gluon is found
+            return mother.id();
+        }
+        motherId = mother.mother1();
+    }
+
+    return -1;
+}
+
+bool SimCharmEvents::isFeedDown(Particle& p){
+
+    int motherId = p.mother1();
+    while(motherId > 0){
+        Particle mother = pythia.event[motherId];
+        if( (mother.idAbs() > 500 && mother.idAbs() < 600)  || (mother.idAbs() > 5000 && mother.idAbs() < 6000) ){
+            return true;
+        }
+        motherId = mother.mother1();
+    }
+
+    return false;
+}

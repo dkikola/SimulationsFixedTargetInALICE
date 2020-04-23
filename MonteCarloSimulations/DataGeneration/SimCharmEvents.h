@@ -38,6 +38,22 @@ public:
 		this->energy = energy;
 	}
 
+    bool getUseExternalPDF() const {
+        return useExternalPDF;
+    }
+
+    void setUseExternalPDF(bool ispdf){
+        this->useExternalPDF = ispdf;
+    }
+
+    bool getUseExternalConfFile() const {
+        return useExternalConfFile;
+    }
+
+    void setUseExternalConfFile(bool isfile){
+        this->useExternalConfFile = isfile;
+    }
+
 	float getMaxHadronEta() const {
 		return maxHadronEta;
 	}
@@ -87,6 +103,14 @@ public:
 		this->outFileName = outFileName;
 	}
 
+    const TString& getPythiaConfigFile() const {
+        return pythiaConfigFile;
+    }
+
+    void setPythiaConfigFile(const TString& pythiaFileName) {
+        this->pythiaConfigFile = pythiaFileName;
+    }
+
 	float getMaxMuonY() const {
 		return maxMuonY;
 	}
@@ -108,9 +132,12 @@ private:
 
 	TString outFileName;
 	TFile* fOut;
+    TString pythiaConfigFile;
 
 	int nEvents;
 	float energy;
+    bool  useExternalPDF;
+    bool  useExternalConfFile;
 	float minPtHadron;
 	float minCharmY; // lower acceptance limit in rapidity;
 	float maxCharmY; // upper acceptance limit in rapidity;
@@ -134,6 +161,8 @@ private:
 	bool isHfMuon(Particle& p, CharmDecay& c);
 	bool isDmeson(int id);
 	void initHfHadronIds();
+    short getOrigin(Particle& p);
+    bool isFeedDown(Particle& p);
 
 };
 

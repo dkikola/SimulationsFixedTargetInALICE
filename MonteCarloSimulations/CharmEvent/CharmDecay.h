@@ -51,6 +51,10 @@ public:
 	void setId(short id) { this->id = id; }
 	short getIdParent() const { return idParent; }
 	void setIdParent(short id) { this->idParent = id; }
+    short getOrigin() const { return origin; }
+    void setOrigin(short o) { this->origin=o; }
+    bool getIsFD() const { return isFD; }
+    void setIsFD(bool FD) { this->isFD = FD; }
 	float getPhi() const {	return phi; }
 	void setPhi(float phi) { this->phi = phi;}
 	float getPt() const { return pT;	}
@@ -61,6 +65,8 @@ public:
 private:
 	short id;	// particle PDG ID
 	short idParent; // PDG ID of the parent
+    short origin; // quark/gluon origin
+    bool isFD;  // if D meson from B decay
 	float pT;	// transverse momentum
 	float eta;	// pseudorapidity
 	float phi;	// azimuthal angle

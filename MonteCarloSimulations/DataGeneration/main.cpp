@@ -8,16 +8,31 @@
 
 int main(int argc, char *argv[]){
 
-	if (argc < 3) {
-		std::cerr << "Usage: nEvents OutputFileName" << std::endl;
-		return 0;
-	}
+    bool useConfFile = atoi(argv[3]);
+
+    if (!useConfFile && argc < 3) {
+        std::cerr << "Usage: nEvents OutputFileName" << std::endl;
+        return 0;
+    }
+    else if(useConfFile && argc < 5) {
+        std::cerr << "Usage: nEvents OutputFileName (bool)usePythiaConfig PythiaConfFile" << std::endl;
+        return 0;
+    }
 
 	char*  outFileName =  argv[2];
 	int nEvents = atoi(argv[1]);
 
 	SimCharmEvents simulations;
 	simulations.setOutFileName(outFileName);
+
+    simulations.setUseExternalConfFile(useConfFile);
+    if(useConfFile) {
+        simulations.setPythiaConfigFile(argv[4]);
+    }
+    else {
+        simulations.setEnergy(8000.0);
+        simulations.setUseExternalPDF(true);                           // if to use external LHAPDF package
+    }
 
 	// LHCb settings
 	simulations.setEnergy(8000.0);
