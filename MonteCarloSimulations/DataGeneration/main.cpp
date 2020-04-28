@@ -8,7 +8,10 @@
 
 int main(int argc, char *argv[]){
 
-    bool useConfFile = atoi(argv[3]);
+    bool useConfFile = false; 
+
+    if(argc==3) useConfFile = false;
+    else useConfFile = atoi(argv[3]);
 
     if (!useConfFile && argc < 3) {
         std::cerr << "Usage: nEvents OutputFileName" << std::endl;
@@ -18,6 +21,7 @@ int main(int argc, char *argv[]){
         std::cerr << "Usage: nEvents OutputFileName (bool)usePythiaConfig PythiaConfFile" << std::endl;
         return 0;
     }
+
 
 	char*  outFileName =  argv[2];
 	int nEvents = atoi(argv[1]);
