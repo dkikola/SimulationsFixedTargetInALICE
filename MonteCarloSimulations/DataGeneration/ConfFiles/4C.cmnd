@@ -1,0 +1,37 @@
+! === Monash 2013 tune
+! This file contains commands to be read in for a Pythia8 run.
+! Lines not beginning with a letter or digit are comments.
+! Names are case-insensitive  -  but spellings-sensitive!
+
+! Beam parameter settings. Values below agree with default ones.
+Beams:idA = 2212
+Beams:idB = 2212
+Beams:eCM = 200 ! RHIC nominal energy
+
+Random:setSeed = on
+Random:seed = 0
+
+! Settings for the hard-process generation.
+
+HardQCD:all = on                   ! switch on all QCD jet + jet processes
+#PhaseSpace:pTHatMin = 50.          ! minimal pT scale in process
+
+! Switch on/off the key event generation steps.
+#PartonLevel:MPI = off              ! no multiparton interactions
+#PartonLevel:ISR = off              ! no initial-state radiation
+#PartonLevel:FSR = off              ! no final-state radiation
+#HadronLevel:Hadronize = off        ! no hadronization
+#HadronLevel:Decay = off            ! no decays
+
+! set decays
+#D0 to piK
+421:onMode = off
+421:onIfMatch = 321 211
+
+#D+ to Kpipi
+411:onMode = off
+411:onIfMatch = 321 211 211
+
+! Other settings. Can be expanded as desired.
+#Tune:preferLHAPDF = off            ! use internal PDFs when LHAPDF not linked
+Tune:pp = 5                        ! use Tune Monash 2013 
