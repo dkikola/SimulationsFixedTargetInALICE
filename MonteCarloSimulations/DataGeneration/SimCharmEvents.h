@@ -156,6 +156,8 @@ private:
 	TH1D* dNdpT_hadron;
 	TH1D* dNdy_Dmeson;
 	TH1D* dNdy_hadron;
+    TH1D *hSigma;
+    TH1D *hStat;
 	bool passHadronCut(Particle& p);
 	bool isDmesonDecay(Particle& p, CharmDecay& c);
 	bool isHfMuon(Particle& p, CharmDecay& c);

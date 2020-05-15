@@ -29,6 +29,13 @@ SimCharmEvents::SimCharmEvents() {
 	dNdy_Dmeson = new TH1D("dNdy_Dmeson","y_{Lab} spectrum; y;dN/dy",100 ,-5.,15.);
 	dNdy_hadron = (TH1D*)dNdy_Dmeson->Clone("dNdy_hadron");
 
+    hSigma = new TH1D("hSigma","cross-sections",2,0,2);
+    hSigma->SetCanExtend(TH1::kAllAxes);
+
+    hStat = new TH1D("hStat","number of event",3,0,3);
+    hStat->GetXaxis()->SetBinLabel(1,"Tried");
+    hStat->GetXaxis()->SetBinLabel(2,"Selected");
+    hStat->GetXaxis()->SetBinLabel(3,"Accepted");
 
 	minPtHadron = 0.2;// GeV/c
     minCharmY = -1.0;
@@ -156,6 +163,8 @@ void SimCharmEvents::saveData() {
 	dNdpT_hadron->Write();
 	dNdy_Dmeson->Write();
 	dNdy_hadron->Write();
+    hSigma->Write();
+    hStat->Write();
 	fOut->Close();
 
 }
@@ -230,6 +239,18 @@ void SimCharmEvents::run(int N) {
 	}
 	pythia.stat();
 
+    std::vector<int> hardProc = pythia.info.codesHard();
+    hSigma->SetBinContent(1,pythia.info.sigmaGen());
+    hSigma->GetXaxis()->SetBinLabel(1,"sum");
+    for(int i=0; i<hardProc.size(); i++){
+        hSigma->SetBinContent(i+2,pythia.info.sigmaGen(hardProc[i]));
+        std::string procName = pythia.info.nameProc(hardProc[i]);
+        hSigma->GetXaxis()->SetBinLabel(i+2,procName.c_str());
+    }
+
+    hStat->SetBinContent(1,pythia.info.nTried());
+    hStat->SetBinContent(2,pythia.info.nSelected());
+    hStat->SetBinContent(3,pythia.info.nAccepted());
 
 }
 
